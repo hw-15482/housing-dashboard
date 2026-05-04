@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The New Renter — American Housing Behavior 2005–2024</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1714;
+    --paper: #f5f0e8;
+    --cream: #ede8dc;
+    --rust: #b84c2b;
+    --rust-light: #d4693e;
+    --slate: #3d4a5c;
+    --slate-light: #6b7a8d;
+    --gold: #c9993a;
+    --divider: #d4ccbc;
+    --chart-1: #b84c2b;
+    --chart-2: #3d4a5c;
+    --chart-3: #c9993a;
+    --chart-4: #7a8f6e;
+    --chart-5: #8b5e83;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* MASTHEAD */
+  .masthead {
+    border-bottom: 3px double var(--ink);
+    padding: 12px 60px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+  }
+
+  /* HERO */
+  .hero {
+    padding: 64px 60px 48px;
+    border-bottom: 1px solid var(--divider);
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 60px;
+    align-items: end;
+  }
+
+  .hero-kicker {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--rust);
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(42px, 5vw, 72px);
+    font-weight: 900;
+    line-height: 1.0;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    margin-bottom: 24px;
+  }
+
+  .hero h1 em {
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .hero-deck {
+    font-size: 17px;
+    color: var(--slate);
+    line-height: 1.7;
+    max-width: 560px;
+    font-weight: 300;
+  }
+
+  .hero-stat-box {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 36px 32px;
+    align-self: stretch;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .hero-stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+    margin-bottom: 12px;
+  }
+
+  .hero-stat-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 72px;
+    font-weight: 900;
+    color: var(--rust-light);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .hero-stat-desc {
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.5;
+  }
+
+  /* SECTION LAYOUT */
+  .section {
+    padding: 56px 60px;
+    border-bottom: 1px solid var(--divider);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 20px;
+    margin-bottom: 8px;
+  }
+
+  .section-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 13px;
+    font-style: italic;
+    color: var(--rust);
+  }
+
+  .section h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.2;
+  }
+
+  .section-subhead {
+    font-size: 14px;
+    color: var(--slate-light);
+    margin-bottom: 36px;
+    margin-top: 6px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  /* CHART CONTAINERS */
+  .chart-wrap {
+    background: white;
+    border: 1px solid var(--divider);
+    padding: 32px;
+    position: relative;
+  }
+
+  .chart-wrap canvas {
+    max-height: 320px;
+  }
+
+  .chart-source {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--slate-light);
+    margin-top: 16px;
+    text-transform: uppercase;
+  }
+
+  /* TWO COLUMN */
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  /* INSIGHT CALLOUT */
+  .insight {
+    background: var(--cream);
+    border-left: 4px solid var(--rust);
+    padding: 20px 24px;
+    margin: 28px 0 0;
+    font-size: 14px;
+    color: var(--slate);
+    line-height: 1.7;
+  }
+
+  .insight strong {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  /* STAT ROW */
+  .stat-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--divider);
+    border: 1px solid var(--divider);
+    margin-bottom: 32px;
+  }
+
+  .stat-cell {
+    background: white;
+    padding: 28px 24px;
+    text-align: center;
+  }
+
+  .stat-cell-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-cell-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--slate-light);
+    line-height: 1.5;
+  }
+
+  /* FOOTER */
+  .footer {
+    padding: 40px 60px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    color: var(--slate-light);
+    line-height: 1.8;
+  }
+
+  .footer-title {
+    font-size: 11px;
+    color: var(--ink);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 10px;
+  }
+
+  /* ANIMATE IN */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero { animation: fadeUp 0.7s ease both; }
+  .section { animation: fadeUp 0.6s ease both; }
+  .section:nth-child(3) { animation-delay: 0.1s; }
+  .section:nth-child(4) { animation-delay: 0.15s; }
+  .section:nth-child(5) { animation-delay: 0.2s; }
+  .section:nth-child(6) { animation-delay: 0.25s; }
+
+  @media (max-width: 900px) {
+    .hero { grid-template-columns: 1fr; padding: 40px 24px 32px; }
+    .hero-stat-box { display: none; }
+    .section { padding: 40px 24px; }
+    .two-col { grid-template-columns: 1fr; }
+    .stat-row { grid-template-columns: 1fr; }
+    .masthead { padding: 10px 24px; }
+    .footer { padding: 32px 24px; grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- MASTHEAD -->
+<div class="masthead">
+  <span>Housing & Consumer Behavior Report</span>
+  <span>2005 – 2024</span>
+  <span>Data: U.S. Census Bureau · Federal Reserve · NAR</span>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-kicker">American Housing Behavior Analysis</div>
+    <h1>The<br><em>New</em><br>Renter</h1>
+    <p class="hero-deck">For the first time in decades, renting is no longer just a starting point. High earners, older millennials, and financially stable Americans are choosing to rent longer — or indefinitely. This is the story of how the American housing decision changed.</p>
+  </div>
+  <div class="hero-stat-box">
+    <div class="hero-stat-label">First-time buyer<br>median age, 2024</div>
+    <div class="hero-stat-number">38</div>
+    <div class="hero-stat-desc">The oldest on record since 1981. In 2010, it was 30.</div>
+  </div>
+</div>
+
+<!-- SECTION 1: Key Stats -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">01 —</span>
+    <h2>By the Numbers</h2>
+  </div>
+  <div class="section-subhead">Key indicators of a shifting housing market · 2024</div>
+
+  <div class="stat-row">
+    <div class="stat-cell">
+      <div class="stat-cell-num" style="color: var(--rust)">37%</div>
+      <div class="stat-cell-label">Homeownership rate<br>adults under 35 · 2024</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-num" style="color: var(--slate)">54%</div>
+      <div class="stat-cell-label">of renters say they<br>can't afford to buy</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-cell-num" style="color: var(--gold)">52%</div>
+      <div class="stat-cell-label">of renters are<br>cost-burdened · 2023</div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 2: Homeownership by Age Over Time -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">02 —</span>
+    <h2>The Generation Gap Widens</h2>
+  </div>
+  <div class="section-subhead">Homeownership rates by age group · 2005–2024 · Source: U.S. Census Bureau HVS</div>
+
+  <div class="chart-wrap">
+    <canvas id="ageChart"></canvas>
+    <div class="chart-source">Source: U.S. Census Bureau, Current Population Survey / Housing Vacancy Survey (CPS/HVS), 1994–2024</div>
+  </div>
+
+  <div class="insight">
+    <strong>The gap is structural, not cyclical.</strong> While all age groups dipped during the 2008 foreclosure crisis, the under-35 cohort never fully recovered — and has trended down since 2020. Adults 65+ have stayed flat near 79%. The distance between these two lines has grown by nearly 12 points since 2005.
+  </div>
+</div>
+
+<!-- SECTION 3: Two column - Income gap + First time buyer age -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">03 —</span>
+    <h2>Wealth Determines Access</h2>
+  </div>
+  <div class="section-subhead">Homeownership rate by income level, and the rising age of first-time buyers</div>
+
+  <div class="two-col">
+    <div>
+      <div style="font-family:'Playfair Display',serif; font-size:16px; font-weight:700; margin-bottom:6px;">Income vs. Ownership Rate</div>
+      <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--slate-light); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:20px;">2019 vs. 2024 · Federal Reserve SHED</div>
+      <div class="chart-wrap">
+        <canvas id="incomeChart"></canvas>
+        <div class="chart-source">Source: Federal Reserve Report on Economic Well-Being of U.S. Households (SHED) 2019, 2024</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-family:'Playfair Display',serif; font-size:16px; font-weight:700; margin-bottom:6px;">First-Time Buyer Median Age</div>
+      <div style="font-family:'DM Mono',monospace; font-size:9px; color:var(--slate-light); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:20px;">2010–2024 · NAR Profile of Home Buyers & Sellers</div>
+      <div class="chart-wrap">
+        <canvas id="buyerAgeChart"></canvas>
+        <div class="chart-source">Source: National Association of Realtors, Profile of Home Buyers and Sellers, annual reports 2010–2024</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>Among adults under 60, high earners own at more than 3× the rate of low earners.</strong> Meanwhile, the median first-time buyer is now 38 — eight years older than in 2010. The path to ownership has lengthened significantly, not just financially but in terms of life stage.
+  </div>
+</div>
+
+<!-- SECTION 4: Why renters rent -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">04 —</span>
+    <h2>Why Renters Stay Renters</h2>
+  </div>
+  <div class="section-subhead">Self-reported reasons for renting rather than owning · 2024 · Federal Reserve SHED</div>
+
+  <div class="two-col">
+    <div class="chart-wrap">
+      <canvas id="reasonsChart"></canvas>
+      <div class="chart-source">Source: Federal Reserve Report on Economic Well-Being of U.S. Households (SHED) 2024</div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:16px; justify-content:center;">
+      <div style="padding:24px; background:var(--ink); color:var(--paper);">
+        <div style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--slate-light); margin-bottom:10px;">Key Finding</div>
+        <div style="font-family:'Playfair Display',serif; font-size:20px; line-height:1.4;">Over 1 in 5 renters say renting is simply <em>more convenient</em> — not a financial necessity.</div>
+      </div>
+      <div style="padding:24px; background:var(--cream); border:1px solid var(--divider);">
+        <div style="font-family:'DM Mono',monospace; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--slate-light); margin-bottom:10px;">Market Implication</div>
+        <div style="font-size:14px; color:var(--slate); line-height:1.7;">PropTech and rental platforms should not assume their users are waiting to buy. A significant and growing share are <strong>long-term renters by choice</strong> — a segment with distinct product, service, and community needs.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 5: Rent Burden -->
+<div class="section">
+  <div class="section-header">
+    <span class="section-num">05 —</span>
+    <h2>The Cost of Staying Flexible</h2>
+  </div>
+  <div class="section-subhead">Percentage of renters spending 30%+ of income on housing · 2010–2023 · U.S. Census ACS</div>
+
+  <div class="chart-wrap">
+    <canvas id="burdenChart"></canvas>
+    <div class="chart-source">Source: U.S. Census Bureau, American Community Survey (ACS); Harvard Joint Center for Housing Studies, State of the Nation's Housing 2024</div>
+  </div>
+
+  <div class="insight">
+    <strong>Rent burden hit a 15-year high in 2023.</strong> After briefly declining during the pandemic — partly due to relief programs and lower urban rents — the share of cost-burdened renters surged back above 50% as rents spiked in 2022–2023. This squeeze is paradoxically making it <em>harder</em> to save for a down payment, further extending rental tenure.
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div>
+    <div class="footer-title">Data Sources</div>
+    U.S. Census Bureau, Current Population Survey / Housing Vacancy Survey (CPS/HVS), 1994–2024<br>
+    Federal Reserve Board, Report on Economic Well-Being of U.S. Households (SHED), 2019 & 2024<br>
+    National Association of Realtors, Profile of Home Buyers and Sellers, 2010–2024<br>
+    U.S. Census Bureau, American Community Survey (ACS)<br>
+    Harvard Joint Center for Housing Studies, State of the Nation's Housing 2024
+  </div>
+  <div>
+    <div class="footer-title">Methodology Note</div>
+    Homeownership rates derived from annual CPS/HVS estimates. Income-based ownership rates from Federal Reserve SHED microdata. First-time buyer age from NAR annual survey of recent buyers. Rent burden defined as gross rent ≥30% of household income. All data publicly available; full citations available upon request.
+  </div>
+</div>
+
+<script>
+const FONT = "'DM Sans', sans-serif";
+const MONO = "'DM Mono', monospace";
+
+Chart.defaults.font.family = FONT;
+Chart.defaults.color = '#6b7a8d';
+
+const gridStyle = {
+  color: '#e8e2d6',
+  lineWidth: 1,
+};
+
+const years = [2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024];
+
+// CHART 1: Age over time
+new Chart(document.getElementById('ageChart'), {
+  type: 'line',
+  data: {
+    labels: years,
+    datasets: [
+      {
+        label: 'Under 35',
+        data: [43.0,42.6,41.7,40.8,39.9,38.5,37.2,36.9,36.8,36.2,35.8,34.1,35.3,36.5,37.6,38.5,37.8,38.3,38.3,37.0],
+        borderColor: '#b84c2b',
+        backgroundColor: 'rgba(184,76,43,0.06)',
+        borderWidth: 2.5,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.35,
+        fill: false,
+      },
+      {
+        label: '35–44',
+        data: [67.9,67.3,66.5,65.6,64.9,63.5,61.9,61.2,60.6,59.9,58.7,58.3,59.5,60.3,61.3,62.4,62.1,62.6,62.6,61.4],
+        borderColor: '#3d4a5c',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.35,
+      },
+      {
+        label: '45–54',
+        data: [76.2,75.9,75.6,75.2,74.5,73.4,72.5,72.1,71.6,71.4,70.7,70.5,70.6,70.9,71.0,71.5,70.9,71.0,70.1,70.8],
+        borderColor: '#c9993a',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.35,
+      },
+      {
+        label: '55–64',
+        data: [80.6,80.5,80.4,80.1,79.7,79.1,78.7,78.1,78.0,77.7,77.1,76.4,76.5,76.3,76.5,76.7,76.4,76.3,75.9,76.3],
+        borderColor: '#7a8f6e',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [4,3],
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.35,
+      },
+      {
+        label: '65+',
+        data: [80.3,80.1,80.1,80.0,80.1,80.4,80.6,80.6,80.6,80.0,79.7,79.3,79.5,79.4,79.6,79.6,79.3,79.1,79.1,79.1],
+        borderColor: '#8b5e83',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        borderDash: [4,3],
+        pointRadius: 0,
+        pointHoverRadius: 5,
+        tension: 0.35,
+      },
+    ]
+  },
+  options: {
+    responsive: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        position: 'top',
+        labels: { font: { family: MONO, size: 10 }, boxWidth: 24, padding: 16, color: '#3d4a5c' }
+      },
+      tooltip: {
+        backgroundColor: '#1a1714',
+        titleFont: { family: MONO, size: 10 },
+        bodyFont: { family: MONO, size: 11 },
+        callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}%` }
+      }
+    },
+    scales: {
+      x: { grid: gridStyle, ticks: { font: { family: MONO, size: 9 }, maxTicksLimit: 8 } },
+      y: {
+        grid: gridStyle,
+        min: 30, max: 85,
+        ticks: { font: { family: MONO, size: 9 }, callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+// CHART 2: Income gap bar chart
+new Chart(document.getElementById('incomeChart'), {
+  type: 'bar',
+  data: {
+    labels: ['Under $25K', '$25K–$49K', '$50K–$74K', '$75K–$99K', '$100K+'],
+    datasets: [
+      {
+        label: '2019',
+        data: [25, 42, 62, 74, 83],
+        backgroundColor: 'rgba(61,74,92,0.25)',
+        borderColor: '#3d4a5c',
+        borderWidth: 1.5,
+      },
+      {
+        label: '2024',
+        data: [22, 38, 58, 72, 85],
+        backgroundColor: 'rgba(184,76,43,0.7)',
+        borderColor: '#b84c2b',
+        borderWidth: 0,
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { font: { family: MONO, size: 10 }, boxWidth: 18, padding: 12 } },
+      tooltip: {
+        backgroundColor: '#1a1714',
+        titleFont: { family: MONO, size: 10 },
+        bodyFont: { family: MONO, size: 11 },
+        callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}%` }
+      }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { font: { family: MONO, size: 8 } } },
+      y: {
+        grid: gridStyle,
+        min: 0, max: 100,
+        ticks: { font: { family: MONO, size: 9 }, callback: v => v + '%' }
+      }
+    }
+  }
+});
+
+// CHART 3: First time buyer age
+new Chart(document.getElementById('buyerAgeChart'), {
+  type: 'line',
+  data: {
+    labels: [2010,2012,2014,2016,2018,2019,2020,2021,2022,2023,2024],
+    datasets: [{
+      label: 'Median Age, First-Time Buyer',
+      data: [30,31,31,32,32,33,33,33,36,35,38],
+      borderColor: '#b84c2b',
+      backgroundColor: 'rgba(184,76,43,0.08)',
+      borderWidth: 2.5,
+      pointRadius: 4,
+      pointBackgroundColor: '#b84c2b',
+      pointBorderColor: 'white',
+      pointBorderWidth: 2,
+      tension: 0.3,
+      fill: true,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a1714',
+        titleFont: { family: MONO, size: 10 },
+        bodyFont: { family: MONO, size: 11 },
+        callbacks: { label: ctx => ` Age ${ctx.parsed.y}` }
+      }
+    },
+    scales: {
+      x: { grid: gridStyle, ticks: { font: { family: MONO, size: 9 } } },
+      y: {
+        grid: gridStyle,
+        min: 28, max: 40,
+        ticks: { font: { family: MONO, size: 9 }, callback: v => 'Age ' + v }
+      }
+    }
+  }
+});
+
+// CHART 4: Why renters rent
+new Chart(document.getElementById('reasonsChart'), {
+  type: 'bar',
+  data: {
+    labels: ["Can't afford\nto buy", "More\nconvenient", "Not ready\nto settle down", "Waiting for\nright time", "Other"],
+    datasets: [{
+      data: [54, 22, 12, 8, 4],
+      backgroundColor: ['#b84c2b','#3d4a5c','#c9993a','#7a8f6e','#ccc'],
+      borderWidth: 0,
+      borderRadius: 2,
+    }]
+  },
+  options: {
+    indexAxis: 'y',
+    responsive: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1a1714',
+        titleFont: { family: MONO, size: 10 },
+        bodyFont: { family: MONO, size: 11 },
+        callbacks: { label: ctx => ` ${ctx.parsed.x}% of renters` }
+      }
+    },
+    scales: {
+      x: {
+        grid: gridStyle,
+        max: 60,
+        ticks: { font: { family: MONO, size: 9 }, callback: v => v + '%' }
+      },
+      y: { grid: { display: false }, ticks: { font: { family: MONO, size: 10 } } }
+    }
+  }
+});
+
+// CHART 5: Rent burden over time
+new Chart(document.getElementById('burdenChart'), {
+  type: 'line',
+  data: {
+    labels: [2010,2012,2014,2016,2018,2019,2020,2021,2022,2023],
+    datasets: [{
+      label: '% of Renters Cost-Burdened (≥30% of income on rent)',
+      data: [50.2,50.5,51.0,49.8,48.3,47.1,46.0,45.0,49.7,52.0],
+      borderColor: '#b84c2b',
+      backgroundColor: 'rgba(184,76,43,0.07)',
+      borderWidth: 2.5,
+      pointRadius: 4,
+      pointBackgroundColor: '#b84c2b',
+      pointBorderColor: 'white',
+      pointBorderWidth: 2,
+      tension: 0.3,
+      fill: true,
+    }]
+  },
+  options: {
+    responsive: true,
+    plugins: {
+      legend: { labels: { font: { family: MONO, size: 10 }, boxWidth: 0, padding: 0, color: 'transparent' } },
+      tooltip: {
+        backgroundColor: '#1a1714',
+        titleFont: { family: MONO, size: 10 },
+        bodyFont: { family: MONO, size: 11 },
+        callbacks: { label: ctx => ` ${ctx.parsed.y}% of renters` }
+      },
+      annotation: {}
+    },
+    scales: {
+      x: { grid: gridStyle, ticks: { font: { family: MONO, size: 9 } } },
+      y: {
+        grid: gridStyle,
+        min: 40, max: 56,
+        ticks: { font: { family: MONO, size: 9 }, callback: v => v + '%' }
+      }
+    }
+  }
+});
+</script>
+</body>
+</html>
